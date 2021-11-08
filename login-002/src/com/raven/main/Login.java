@@ -7,6 +7,7 @@ public class Login extends javax.swing.JFrame {
     public Login() {
         initComponents();
         getContentPane().setBackground(new Color(255, 255, 255));
+        slide.setFram(Login.this);
     }
 
     @SuppressWarnings("unchecked")

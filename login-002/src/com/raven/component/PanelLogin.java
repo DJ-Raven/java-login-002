@@ -66,6 +66,18 @@ public class PanelLogin extends javax.swing.JPanel {
         cmd.addActionListener(event);
     }
 
+    public boolean checkUser() {
+        return !(txtUser.getText().trim().equals("") || String.valueOf(txtPass.getPassword()).trim().equals(""));
+    }
+
+    public String getUserName() {
+        return txtUser.getText().trim();
+    }
+
+    public String getPassword() {
+        return String.valueOf(txtPass.getPassword());
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private com.raven.swing.Button cmd;
     private javax.swing.JLabel jLabel1;
