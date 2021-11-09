@@ -22,6 +22,7 @@ public class ImageAvatar extends JComponent {
 
     public void setIcon(Icon icon) {
         this.icon = icon;
+        repaint();
     }
 
     public int getBorderSize() {
@@ -31,7 +32,6 @@ public class ImageAvatar extends JComponent {
     public void setBorderSize(int borderSize) {
         this.borderSize = borderSize;
     }
-
     private Icon icon;
     private int borderSize;
 
@@ -90,7 +90,7 @@ public class ImageAvatar extends JComponent {
             height = 1;
         }
         int cw = size;
-        int ch =size;
+        int ch = size;
         int x = (cw - width) / 2;
         int y = (ch - height) / 2;
         return new Rectangle(new Point(x, y), new Dimension(width, height));

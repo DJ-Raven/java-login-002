@@ -2,6 +2,7 @@ package com.raven.component;
 
 import com.raven.main.Main;
 import com.raven.model.ModelUser;
+import connection.DatabaseConnection;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -10,6 +11,9 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Path2D;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import net.miginfocom.swing.MigLayout;
@@ -122,10 +126,28 @@ public class PanelSlide extends javax.swing.JLayeredPane {
             public void run() {
                 try {
                     Thread.sleep(2000);
+                    String sql = "select UserID, UserName, `Profile` from `user` where BINARY(UserName)=? and BINARY(`Password`)=? limit 1";
+                    PreparedStatement p = DatabaseConnection.getInstance().getConnection().prepareStatement(sql);
+                    p.setString(1, userName);
+                    p.setString(2, password);
+                    ResultSet r = p.executeQuery();
+                    if (r.first()) {
+                        int id = r.getInt("UserID");
+                        String user = r.getString("UserName");
+                        Icon profile;
+                        if (r.getObject("Profile") != null) {
+                            profile = new ImageIcon(r.getBytes("Profile"));
+                        } else {
+                            profile = new ImageIcon(getClass().getResource("/com/raven/icon/user.png"));
+                        }
+                        ModelUser data = new ModelUser(id, user, profile);
+                        loading.doneLogin(data);
+                    } else {
+                        loading.showError("User and Password Incorrect");
+                    }
+                    r.close();
+                    p.close();
 
-                    //  Test
-                    loading.doneLogin(new ModelUser(1, "Raven", new ImageIcon(getClass().getResource("/com/raven/icon/p1.jpg"))));
-                    //  loading.showError("User and Password Incorrect");
                 } catch (InterruptedException e) {
 
                 } catch (Exception e) {

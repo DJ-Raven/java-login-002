@@ -1,11 +1,20 @@
 package com.raven.component;
 
 import com.raven.model.ModelUser;
+import connection.DatabaseConnection;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
 import java.awt.geom.Path2D;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.TimingTarget;
 import org.jdesktop.animation.timing.TimingTargetAdapter;
@@ -96,6 +105,7 @@ public class PanelLoading extends javax.swing.JLayeredPane {
         profile = new com.raven.swing.PanelTransparent();
         cmdCancel1 = new com.raven.swing.Button();
         pic = new com.raven.swing.ImageAvatar();
+        cmdEdit = new com.raven.swing.EditButton();
         cmdContinue = new com.raven.swing.Button();
         loading = new com.raven.swing.PanelTransparent();
         cmdCancel = new com.raven.swing.Button();
@@ -116,6 +126,31 @@ public class PanelLoading extends javax.swing.JLayeredPane {
         pic.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/raven/icon/user.png"))); // NOI18N
         pic.setOpaque(true);
 
+        cmdEdit.setBackground(new java.awt.Color(55, 55, 55));
+        cmdEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/raven/icon/edit.png"))); // NOI18N
+        cmdEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdEditActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout picLayout = new javax.swing.GroupLayout(pic);
+        pic.setLayout(picLayout);
+        picLayout.setHorizontalGroup(
+            picLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, picLayout.createSequentialGroup()
+                .addContainerGap(104, Short.MAX_VALUE)
+                .addComponent(cmdEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        picLayout.setVerticalGroup(
+            picLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, picLayout.createSequentialGroup()
+                .addContainerGap(104, Short.MAX_VALUE)
+                .addComponent(cmdEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
         cmdContinue.setBackground(new java.awt.Color(88, 130, 172));
         cmdContinue.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
         cmdContinue.setForeground(new java.awt.Color(255, 255, 255));
@@ -134,7 +169,7 @@ public class PanelLoading extends javax.swing.JLayeredPane {
                 .addGroup(profileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(profileLayout.createSequentialGroup()
                         .addGap(100, 100, 100)
-                        .addComponent(pic, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(pic, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(profileLayout.createSequentialGroup()
                         .addGap(50, 50, 50)
                         .addComponent(cmdContinue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
@@ -144,7 +179,7 @@ public class PanelLoading extends javax.swing.JLayeredPane {
             profileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, profileLayout.createSequentialGroup()
                 .addGap(50, 50, 50)
-                .addComponent(pic, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pic, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(50, 50, 50)
                 .addComponent(cmdContinue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 85, Short.MAX_VALUE)
@@ -221,6 +256,39 @@ public class PanelLoading extends javax.swing.JLayeredPane {
         add(message, "card2");
     }// </editor-fold>//GEN-END:initComponents
 
+    private void cmdEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdEditActionPerformed
+        JFileChooser ch = new JFileChooser();
+        ch.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                String name = file.getName().toLowerCase();
+                return file.isDirectory() || name.endsWith(".png") || name.endsWith(".jpg");
+            }
+
+            @Override
+            public String getDescription() {
+                return "Image File";
+            }
+        });
+        int option = ch.showOpenDialog(this);
+        if (option == JFileChooser.APPROVE_OPTION) {
+            File file = ch.getSelectedFile();
+            ImageIcon icon = new ImageIcon(file.getAbsolutePath());
+            pic.setIcon(icon);
+            repaint();
+            try {
+                String sql = "update `user` set `Profile`=? where UserID=? limit 1";
+                PreparedStatement p = DatabaseConnection.getInstance().getConnection().prepareStatement(sql);
+                p.setBinaryStream(1, Files.newInputStream(file.toPath()));
+                p.setInt(2, data.getUserID());
+                p.execute();
+                data.setProfile(icon);
+            } catch (IOException | SQLException e) {
+                System.err.println(e);
+            }
+        }
+    }//GEN-LAST:event_cmdEditActionPerformed
+
     @Override
     public void paint(Graphics grphcs) {
         Graphics2D g2 = (Graphics2D) grphcs.create();
@@ -271,6 +339,7 @@ public class PanelLoading extends javax.swing.JLayeredPane {
     private com.raven.swing.Button cmdCancel1;
     private com.raven.swing.Button cmdCancel2;
     private com.raven.swing.Button cmdContinue;
+    private com.raven.swing.EditButton cmdEdit;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel lbMessage;
     private com.raven.swing.PanelTransparent loading;
