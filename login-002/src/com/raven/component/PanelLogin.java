@@ -54,11 +54,11 @@ public class PanelLogin extends javax.swing.JPanel {
                 .addComponent(jLabel1)
                 .addGap(50, 50, 50)
                 .addComponent(txtUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtPass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(50, 50, 50)
                 .addComponent(cmd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(112, Short.MAX_VALUE))
+                .addContainerGap(124, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -67,7 +67,16 @@ public class PanelLogin extends javax.swing.JPanel {
     }
 
     public boolean checkUser() {
-        return !(txtUser.getText().trim().equals("") || String.valueOf(txtPass.getPassword()).trim().equals(""));
+        boolean action = true;
+        if (txtUser.getText().trim().equals("")) {
+            txtUser.setHelperText("Please input user name");
+            action = false;
+        }
+        if (String.valueOf(txtPass.getPassword()).trim().equals("")) {
+            txtPass.setHelperText("Please input password");
+            action = false;
+        }
+        return action;
     }
 
     public String getUserName() {

@@ -1,6 +1,7 @@
 package com.raven.swing;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -18,6 +19,15 @@ import org.jdesktop.animation.timing.TimingTarget;
 import org.jdesktop.animation.timing.TimingTargetAdapter;
 
 public class TextField extends JTextField {
+
+    public String getHelperText() {
+        return helperText;
+    }
+
+    public void setHelperText(String helperText) {
+        this.helperText = helperText;
+        repaint();
+    }
 
     public String getLabelText() {
         return labelText;
@@ -41,10 +51,12 @@ public class TextField extends JTextField {
     private boolean show;
     private boolean mouseOver = false;
     private String labelText = "Label";
+    private String helperText = "";
+    private int spaceHelperText = 15;
     private Color lineColor = new Color(3, 155, 216);
 
     public TextField() {
-        setBorder(new EmptyBorder(20, 3, 10, 3));
+        setBorder(new EmptyBorder(20, 3, 23, 3));
         setSelectionColor(new Color(76, 204, 255));
         addMouseListener(new MouseAdapter() {
             @Override
@@ -114,9 +126,10 @@ public class TextField extends JTextField {
         } else {
             g2.setColor(new Color(150, 150, 150));
         }
-        g2.fillRect(2, height - 1, width - 4, 1);
+        g2.fillRect(2, height - spaceHelperText - 1, width - 4, 1);
         createHintText(g2);
         createLineStyle(g2);
+        createHelperText(g2);
         g2.dispose();
     }
 
@@ -143,7 +156,7 @@ public class TextField extends JTextField {
     private void createLineStyle(Graphics2D g2) {
         if (isFocusOwner()) {
             double width = getWidth() - 4;
-            int height = getHeight();
+            int height = getHeight() - spaceHelperText;
             g2.setColor(lineColor);
             double size;
             if (show) {
@@ -153,6 +166,20 @@ public class TextField extends JTextField {
             }
             double x = (width - size) / 2;
             g2.fillRect((int) (x + 2), height - 2, (int) size, 2);
+        }
+    }
+
+    private void createHelperText(Graphics2D g2) {
+        if (helperText != null && !helperText.equals("")) {
+            Insets in = getInsets();
+            int height = getHeight() - 15;
+            g2.setColor(new Color(255, 76, 76));
+            Font font = getFont();
+            g2.setFont(font.deriveFont(0, font.getSize() - 1));
+            FontMetrics ft = g2.getFontMetrics();
+            Rectangle2D r2 = ft.getStringBounds(labelText, g2);
+            double textY = (15 - r2.getHeight()) / 2f;
+            g2.drawString(helperText, in.right, (int) (height + ft.getAscent() - textY));
         }
     }
 
